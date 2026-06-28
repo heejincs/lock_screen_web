@@ -15,4 +15,9 @@ export default defineConfig({
       },
     },
   },
+  // `vite preview` defaults to localhost-only Host check. Accept the
+  // public hostname so the cloudflared tunnel can forward to it.
+  preview: {
+    allowedHosts: ['agent.ncreate.ai'],
+  },
 })

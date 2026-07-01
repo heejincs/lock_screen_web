@@ -25,4 +25,10 @@ export interface AgentRow {
 
 export interface AgentList {
   agents: AgentRow[]
+  /**
+   * Server host's average GPU utilization (%) over a rolling 20-min
+   * window. Absent when the server has no GPU or its sampler is off.
+   * Schema: `agent-list.cue` #AgentList.gpuAvg20m.
+   */
+  gpuAvg20m?: number
 }

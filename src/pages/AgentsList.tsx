@@ -31,18 +31,25 @@ export default function AgentsList() {
   if (unauthed) {
     return (
       <main style={{ padding: 16 }}>
+        <GpuBar list={list} />
         <p>Sign in to view your agents.</p>
         <a href={signInUrl()}>Sign in with Google</a>
       </main>
     )
   }
-  if (error) return <main style={{ padding: 16 }}>Error: {error}</main>
+  if (error) return <main style={{ padding: 16 }}><GpuBar list={list} />Error: {error}</main>
   if (!list) return <main style={{ padding: 16 }}>Loading…</main>
   if (list.agents.length === 0)
-    return <main style={{ padding: 16 }}>No agents yet.</main>
+    return (
+      <main style={{ padding: 16 }}>
+        <GpuBar list={list} />
+        No agents yet.
+      </main>
+    )
 
   return (
     <main style={{ padding: 16 }}>
+      <GpuBar list={list} />
       <h1>Agents</h1>
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {list.agents.map((a) => {
@@ -59,6 +66,39 @@ export default function AgentsList() {
       </ul>
     </main>
   )
+}
+
+/**
+ * Top-of-page GPU strip. Renders one chip per server reporting
+ * `gpuAvg20m`; if the API returns a single AgentList (current shape),
+ * shows just that one. Silently skips when no server reports a value.
+ *
+ * Schema: agent-list.cue #AgentList.gpuAvg20m.
+ */
+function GpuBar({ list }: { list: AgentList | null }) {
+  if (!list || list.gpuAvg20m == null) return null
+  const pct = list.gpuAvg20m
+  return (
+    <div style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '6px 0', fontSize: 13 }}>
+      <strong>GPU</strong>
+      <span style={{
+        padding: '2px 6px',
+        borderRadius: 4,
+        background: '#f0f0f0',
+        color: gpuTint(pct),
+        fontWeight: 600,
+      }}>
+        {Math.round(pct)}%
+      </span>
+      <span style={{ color: '#888' }}>20m avg</span>
+    </div>
+  )
+}
+
+function gpuTint(pct: number): string {
+  if (pct >= 80) return '#d32f2f'
+  if (pct >= 40) return '#f57c00'
+  return '#2e7d32'
 }
 
 /** Matches the Android `statusGlyph` in MainActivity.kt — keep in sync. */

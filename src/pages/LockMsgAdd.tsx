@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { AppendRequest, AppendResponse, BulletinCategory } from '../types/bulletin'
-import { postJson, UnauthenticatedError } from '../lib/api'
+import { postJson, UnauthenticatedError, NotImplementedError } from '../lib/api'
 import { signInUrl } from '../lib/auth'
 
 /**
@@ -38,6 +38,10 @@ export default function LockMsgAdd() {
         window.location.href = signInUrl()
         return
       }
+      if (e instanceof NotImplementedError) {
+        setResult('백엔드 미구현 (wiki cc 대기 중)')
+        return
+      }
       setResult(`실패: ${(e as Error).message}`)
     } finally {
       setSubmitting(false)
@@ -66,9 +70,6 @@ export default function LockMsgAdd() {
             rows={4}
             style={{ width: '100%' }}
           />
-          <small style={{ color: '#888' }}>
-            PIN 0303은 어깨너머 차단용 — 진짜 비밀에는 쓰지 마세요.
-          </small>
         </label>
         <fieldset>
           <legend>카테고리</legend>

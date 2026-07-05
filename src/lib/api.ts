@@ -16,6 +16,18 @@ export class UnauthenticatedError extends Error {
 }
 
 /**
+ * The endpoint doesn't exist on the wiki backend yet.  Distinct from a
+ * generic HTTP 404 so pages can render a "coming soon" placeholder
+ * instead of a red error string.
+ */
+export class NotImplementedError extends Error {
+  constructor(path: string) {
+    super(`Endpoint not implemented: ${path}`)
+    this.name = 'NotImplementedError'
+  }
+}
+
+/**
  * Fetch JSON from a wiki API path. Throws UnauthenticatedError on 401
  * and a plain Error with the response status text on other failures.
  *
@@ -32,6 +44,7 @@ export async function getJson<T>(path: string, init: RequestInit = {}): Promise<
     headers: { Accept: 'application/json', ...(init.headers ?? {}) },
   })
   if (resp.status === 401) throw new UnauthenticatedError()
+  if (resp.status === 404) throw new NotImplementedError(path)
   if (!resp.ok) throw new Error(`HTTP ${resp.status} ${resp.statusText}`)
   return resp.json() as Promise<T>
 }
@@ -52,6 +65,7 @@ export async function postJson<T>(path: string, body: unknown): Promise<T> {
     body: JSON.stringify(body),
   })
   if (resp.status === 401) throw new UnauthenticatedError()
+  if (resp.status === 404) throw new NotImplementedError(path)
   if (!resp.ok) throw new Error(`HTTP ${resp.status} ${resp.statusText}`)
   return resp.json() as Promise<T>
 }

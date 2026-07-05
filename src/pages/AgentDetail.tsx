@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import type { AgentDetail } from '../types/agent-detail'
-import { getJson, UnauthenticatedError } from '../lib/api'
+import { getJson, UnauthenticatedError, NotImplementedError } from '../lib/api'
 import { signInUrl } from '../lib/auth'
 
 /**
@@ -17,6 +17,7 @@ export default function AgentDetail() {
   const [detail, setDetail] = useState<AgentDetail | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [unauthed, setUnauthed] = useState(false)
+  const [pendingBackend, setPendingBackend] = useState(false)
 
   useEffect(() => {
     const path = `/api/agent-detail?server=${encodeURIComponent(serverId)}&name=${encodeURIComponent(name)}`
@@ -24,11 +25,23 @@ export default function AgentDetail() {
       .then(setDetail)
       .catch((e) => {
         if (e instanceof UnauthenticatedError) setUnauthed(true)
+        else if (e instanceof NotImplementedError) setPendingBackend(true)
         else setError(e.message)
       })
   }, [serverId, name])
 
   if (unauthed) return <main style={{ padding: 16 }}><a href={signInUrl()}>Sign in</a></main>
+  if (pendingBackend)
+    return (
+      <main style={{ padding: 16 }}>
+        <p><Link to="/">← Agents</Link></p>
+        <h1>{name}</h1>
+        <p style={{ color: '#666' }}>
+          Wiki backend endpoint <code>/api/agent-detail</code> is not yet
+          implemented — waiting on wiki cc.
+        </p>
+      </main>
+    )
   if (error) return <main style={{ padding: 16 }}>Error: {error}</main>
   if (!detail) return <main style={{ padding: 16 }}>Loading {name}…</main>
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import type { AgentList } from '../types/agent-list'
-import { getJson, UnauthenticatedError } from '../lib/api'
+import { getJson, UnauthenticatedError, NotImplementedError } from '../lib/api'
 import { resolveEffectiveStatus } from '../lib/effectiveStatus'
 import { signInUrl } from '../lib/auth'
 
@@ -18,12 +18,14 @@ export default function AgentsList() {
   const [list, setList] = useState<AgentList | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [unauthed, setUnauthed] = useState(false)
+  const [pendingBackend, setPendingBackend] = useState(false)
 
   useEffect(() => {
     getJson<AgentList>('/api/agent-list')
       .then(setList)
       .catch((e) => {
         if (e instanceof UnauthenticatedError) setUnauthed(true)
+        else if (e instanceof NotImplementedError) setPendingBackend(true)
         else setError(e.message)
       })
   }, [])
@@ -34,6 +36,18 @@ export default function AgentsList() {
         <GpuBar list={list} />
         <p>Sign in to view your agents.</p>
         <a href={signInUrl()}>Sign in with Google</a>
+      </main>
+    )
+  }
+  if (pendingBackend) {
+    return (
+      <main style={{ padding: 16 }}>
+        <GpuBar list={list} />
+        <h1>Agents</h1>
+        <p style={{ color: '#666' }}>
+          Wiki backend endpoint <code>/api/agent-list</code> is not yet
+          implemented — waiting on wiki cc.
+        </p>
       </main>
     )
   }

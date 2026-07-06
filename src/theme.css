@@ -1,0 +1,411 @@
+/*
+ * Material 3–flavoured tokens for the web mirror.  Colours are the M3
+ * baseline (Roboto-esque neutrals + one seeded primary).  Kept as CSS
+ * custom properties so light/dark switches by only re-defining vars
+ * under `@media (prefers-color-scheme: dark)`.
+ *
+ * NOT loaded from a CDN — the whole file is bundled with the SPA.
+ */
+
+:root {
+  color-scheme: light dark;
+
+  --md-sys-color-primary: #4f46e5;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #e0e7ff;
+  --md-sys-color-on-primary-container: #1e1b4b;
+
+  --md-sys-color-surface: #ffffff;
+  --md-sys-color-surface-container: #f4f4f7;
+  --md-sys-color-surface-container-high: #ececf1;
+  --md-sys-color-on-surface: #1c1b1f;
+  --md-sys-color-on-surface-variant: #49454f;
+  --md-sys-color-outline: #cac4d0;
+  --md-sys-color-outline-variant: #e7e0ec;
+
+  --md-sys-color-error: #b3261e;
+  --md-sys-color-on-error: #ffffff;
+  --md-sys-color-warn: #f57c00;
+  --md-sys-color-ok: #2e7d32;
+
+  --md-sys-color-status-wip: #4f46e5;
+  --md-sys-color-status-done: #2e7d32;
+  --md-sys-color-status-fail: #b3261e;
+  --md-sys-color-status-stale: #9ca3af;
+  --md-sys-color-status-idle: #6b7280;
+
+  --md-shape-corner-sm: 8px;
+  --md-shape-corner-md: 12px;
+  --md-shape-corner-lg: 16px;
+
+  --md-elevation-1: 0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --md-elevation-2: 0 2px 6px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto,
+    "Noto Sans KR", "Malgun Gothic", sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Consolas,
+    "Liberation Mono", Menlo, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --md-sys-color-primary: #a5b4fc;
+    --md-sys-color-on-primary: #1e1b4b;
+    --md-sys-color-primary-container: #312e81;
+    --md-sys-color-on-primary-container: #e0e7ff;
+
+    --md-sys-color-surface: #141218;
+    --md-sys-color-surface-container: #201f24;
+    --md-sys-color-surface-container-high: #2b2930;
+    --md-sys-color-on-surface: #e6e0e9;
+    --md-sys-color-on-surface-variant: #cac4d0;
+    --md-sys-color-outline: #48454b;
+    --md-sys-color-outline-variant: #322f35;
+
+    --md-sys-color-error: #f2b8b5;
+    --md-sys-color-on-error: #601410;
+    --md-sys-color-warn: #ffb74d;
+    --md-sys-color-ok: #81c784;
+
+    --md-sys-color-status-wip: #a5b4fc;
+    --md-sys-color-status-done: #81c784;
+    --md-sys-color-status-fail: #f2b8b5;
+    --md-sys-color-status-stale: #9ca3af;
+    --md-sys-color-status-idle: #a1a1aa;
+  }
+}
+
+/* --- Reset-ish base ---------------------------------------------------- */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.4;
+  -webkit-text-size-adjust: 100%;
+}
+
+a { color: var(--md-sys-color-primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+button {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+input, textarea, select {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+code, pre { font-family: var(--font-mono); font-size: 0.9em; }
+
+/* --- Layout primitives -------------------------------------------------- */
+
+.app-shell {
+  min-height: 100vh;
+  max-width: 720px;
+  margin: 0 auto;
+  padding-bottom: 32px;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px 8px;
+  color: var(--md-sys-color-on-surface);
+}
+.top-bar h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  flex: 1;
+}
+.top-bar .top-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 13px;
+}
+
+.tab-bar {
+  display: flex;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  background: var(--md-sys-color-surface);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.tab-bar a {
+  flex: 1;
+  text-align: center;
+  padding: 12px 8px 10px;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 14px;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  text-decoration: none;
+}
+.tab-bar a.active {
+  color: var(--md-sys-color-primary);
+  border-bottom-color: var(--md-sys-color-primary);
+}
+.tab-bar a .tab-badge {
+  display: inline-block;
+  min-width: 18px;
+  padding: 0 6px;
+  margin-left: 6px;
+  height: 18px;
+  line-height: 18px;
+  border-radius: 9px;
+  background: var(--md-sys-color-error);
+  color: var(--md-sys-color-on-error);
+  font-size: 11px;
+  font-weight: 600;
+  vertical-align: 1px;
+}
+
+.page {
+  padding: 12px 16px 24px;
+}
+
+.card {
+  background: var(--md-sys-color-surface-container);
+  border-radius: var(--md-shape-corner-md);
+  padding: 12px;
+  box-shadow: var(--md-elevation-1);
+}
+
+.card + .card { margin-top: 8px; }
+
+.list-card {
+  background: var(--md-sys-color-surface);
+  border-radius: var(--md-shape-corner-md);
+  overflow: hidden;
+  border: 1px solid var(--md-sys-color-outline-variant);
+}
+.list-card > * + * {
+  border-top: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.list-row {
+  display: block;
+  padding: 12px 14px;
+  color: inherit;
+  text-decoration: none;
+  transition: background 120ms ease;
+}
+.list-row:hover {
+  background: var(--md-sys-color-surface-container);
+  text-decoration: none;
+}
+
+.list-row-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.list-row-head .status-glyph {
+  font-size: 18px;
+  line-height: 1;
+  width: 20px;
+  text-align: center;
+}
+.list-row-head .name {
+  font-weight: 600;
+  font-size: 15px;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.list-row-head .timestamp {
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+.list-row-body {
+  margin-top: 4px;
+  padding-left: 28px;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+/* status glyph tints — matched to token vars above. */
+.st-wip   { color: var(--md-sys-color-status-wip); }
+.st-done  { color: var(--md-sys-color-status-done); }
+.st-fail  { color: var(--md-sys-color-status-fail); }
+.st-stale { color: var(--md-sys-color-status-stale); }
+.st-idle  { color: var(--md-sys-color-status-idle); }
+.st-closed { color: var(--md-sys-color-status-stale); }
+
+/* --- GPU strip --------------------------------------------------------- */
+
+.gpu-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 8px 0 12px;
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 12px;
+}
+.gpu-strip .gpu-label {
+  font-weight: 600;
+  color: var(--md-sys-color-on-surface);
+}
+.gpu-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--md-sys-color-surface-container-high);
+  font-size: 12px;
+}
+.gpu-chip .gpu-pct { font-weight: 700; }
+.gpu-pct-hot  { color: var(--md-sys-color-error); }
+.gpu-pct-warm { color: var(--md-sys-color-warn); }
+.gpu-pct-ok   { color: var(--md-sys-color-ok); }
+
+/* --- Chips / status pills ---------------------------------------------- */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--md-sys-color-surface-container-high);
+  color: var(--md-sys-color-on-surface-variant);
+  font-size: 12px;
+  font-weight: 500;
+}
+.chip.chip-primary {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+
+/* --- Filled button ----------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  font-weight: 600;
+  font-size: 14px;
+  min-width: 88px;
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.btn.btn-tonal {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+}
+.btn.btn-text {
+  background: transparent;
+  color: var(--md-sys-color-primary);
+}
+
+/* --- Form fields ------------------------------------------------------- */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.field label,
+.field .field-label {
+  font-size: 13px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+.field textarea,
+.field input[type=text],
+.field input[type=password],
+.field input[type=email] {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--md-shape-corner-sm);
+  border: 1px solid var(--md-sys-color-outline);
+  background: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  resize: vertical;
+}
+.field textarea:focus,
+.field input:focus {
+  outline: 2px solid var(--md-sys-color-primary);
+  outline-offset: -1px;
+}
+
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.chip-group input[type=radio] { display: none; }
+.chip-group label {
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--md-sys-color-outline);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--md-sys-color-on-surface);
+}
+.chip-group label:has(input:checked) {
+  background: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  border-color: transparent;
+}
+
+/* --- Utility ----------------------------------------------------------- */
+
+.muted { color: var(--md-sys-color-on-surface-variant); font-size: 13px; }
+.stack > * + * { margin-top: 12px; }
+.markdown pre {
+  background: var(--md-sys-color-surface-container-high);
+  padding: 12px;
+  border-radius: var(--md-shape-corner-sm);
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+.progress-bar {
+  height: 3px;
+  background: var(--md-sys-color-primary-container);
+  overflow: hidden;
+}
+.progress-bar::after {
+  content: '';
+  display: block;
+  width: 40%;
+  height: 100%;
+  background: var(--md-sys-color-primary);
+  animation: progress-slide 1.4s ease-in-out infinite;
+}
+@keyframes progress-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}

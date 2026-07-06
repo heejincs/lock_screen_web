@@ -4,15 +4,13 @@ import type { AgentList } from '../types/agent-list'
 import { getJson, UnauthenticatedError, NotImplementedError } from '../lib/api'
 import { resolveEffectiveStatus } from '../lib/effectiveStatus'
 import { signInUrl } from '../lib/auth'
+import { formatRelativeShort } from '../lib/timeAgo'
 
 /**
- * Flat list of every agent across every server the user has access to,
- * newest-first by updatedAt.  Mirrors `MainActivity > Agents tab`
- * (`view_separation.md` §6.2 row 1).
- *
- * Server endpoint NOT yet implemented (wiki cc work).  Currently calls
- * `/api/agent-list` which 404s — the page renders the empty state and
- * a link to the wiki sign-in if the call is 401.
+ * Flat list of every agent, newest-first by updatedAt.  Mirrors the
+ * Android `MainActivity > Agents tab` (docs/view_separation.md §6.2).
+ * GPU strip renders when the server reports `gpuAvg20m` — silent
+ * otherwise.
  */
 export default function AgentsList() {
   const [list, setList] = useState<AgentList | null>(null)
@@ -32,90 +30,76 @@ export default function AgentsList() {
 
   if (unauthed) {
     return (
-      <main style={{ padding: 16 }}>
-        <GpuBar list={list} />
+      <main className="page">
         <p>Sign in to view your agents.</p>
-        <a href={signInUrl()}>Sign in with Google</a>
+        <a href={signInUrl()} className="btn">Sign in with Google</a>
       </main>
     )
   }
   if (pendingBackend) {
     return (
-      <main style={{ padding: 16 }}>
+      <main className="page">
         <GpuBar list={list} />
-        <h1>Agents</h1>
-        <p style={{ color: '#666' }}>
-          Wiki backend endpoint <code>/api/agent-list</code> is not yet
-          implemented — waiting on wiki cc.
+        <p className="muted">
+          Wiki 백엔드 <code>/api/agent-list</code> 미구현 — wiki cc 대기 중.
         </p>
       </main>
     )
   }
-  if (error) return <main style={{ padding: 16 }}><GpuBar list={list} />Error: {error}</main>
-  if (!list) return <main style={{ padding: 16 }}>Loading…</main>
+  if (error) return <main className="page"><GpuBar list={list} />Error: {error}</main>
+  if (!list) return <main className="page">Loading…</main>
   if (list.agents.length === 0)
     return (
-      <main style={{ padding: 16 }}>
+      <main className="page">
         <GpuBar list={list} />
-        No agents yet.
+        <p className="muted">No agents yet.</p>
       </main>
     )
 
   return (
-    <main style={{ padding: 16 }}>
+    <main className="page">
       <GpuBar list={list} />
-      <h1>Agents</h1>
-      <ul style={{ listStyle: 'none', padding: 0 }}>
+      <div className="list-card">
         {list.agents.map((a) => {
           const status = resolveEffectiveStatus(a.status, a.updatedAt)
           return (
-            <li key={`${a.serverId}|${a.name}`} style={{ padding: '10px 0', borderBottom: '1px solid #eee' }}>
-              <Link to={`/agent/${encodeURIComponent(a.serverId)}/${encodeURIComponent(a.name)}`}>
-                <span>{statusGlyph(status)}</span> <strong>{a.name}</strong>
-              </Link>
-              <div style={{ color: '#666', fontSize: 13 }}>{a.summary || '(no status)'}</div>
-            </li>
+            <Link
+              className="list-row"
+              key={`${a.serverId}|${a.name}`}
+              to={`/agent/${encodeURIComponent(a.serverId)}/${encodeURIComponent(a.name)}`}
+            >
+              <div className="list-row-head">
+                <span className={`status-glyph st-${status}`}>{statusGlyph(status)}</span>
+                <span className="name">{a.name}</span>
+                <span className="timestamp">{formatRelativeShort(a.updatedAt)}</span>
+              </div>
+              <div className="list-row-body">
+                {a.summary || '(no status)'}
+              </div>
+            </Link>
           )
         })}
-      </ul>
+      </div>
     </main>
   )
 }
 
-/**
- * Top-of-page GPU strip. Renders one chip per server reporting
- * `gpuAvg20m`; if the API returns a single AgentList (current shape),
- * shows just that one. Silently skips when no server reports a value.
- *
- * Schema: agent-list.cue #AgentList.gpuAvg20m.
- */
 function GpuBar({ list }: { list: AgentList | null }) {
   if (!list || list.gpuAvg20m == null) return null
   const pct = list.gpuAvg20m
+  const tone = pct >= 80 ? 'gpu-pct-hot' : pct >= 40 ? 'gpu-pct-warm' : 'gpu-pct-ok'
   return (
-    <div style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '6px 0', fontSize: 13 }}>
-      <strong>GPU</strong>
-      <span style={{
-        padding: '2px 6px',
-        borderRadius: 4,
-        background: '#f0f0f0',
-        color: gpuTint(pct),
-        fontWeight: 600,
-      }}>
-        {Math.round(pct)}%
+    <div className="gpu-strip">
+      <span className="gpu-label">GPU</span>
+      <span className="gpu-chip">
+        <span>main</span>
+        <span className={`gpu-pct ${tone}`}>{Math.round(pct)}%</span>
       </span>
-      <span style={{ color: '#888' }}>20m avg</span>
+      <span>20m avg</span>
     </div>
   )
 }
 
-function gpuTint(pct: number): string {
-  if (pct >= 80) return '#d32f2f'
-  if (pct >= 40) return '#f57c00'
-  return '#2e7d32'
-}
-
-/** Matches the Android `statusGlyph` in MainActivity.kt — keep in sync. */
 function statusGlyph(status: string): string {
   switch (status.toLowerCase()) {
     case 'stale': return '○'

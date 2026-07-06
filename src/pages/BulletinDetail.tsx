@@ -2,14 +2,12 @@ import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 
 /**
- * PIN-gated detail page — mirrors Android `BulletinDetailActivity`.
- * Shares the same shoulder-surfing PIN (`0303`) as the widget;
- * see `docs/view_separation.md` §4.4 for PIN policy (real secrets
- * should use a stronger gate — separate track).
+ * PIN-gated bulletin detail — mirrors Android `BulletinDetailActivity`.
+ * PIN `0303` blocks shoulder-surfing only; real secrets belong behind a
+ * stronger gate (see docs/view_separation.md §4.4).
  *
- * Phase 1 stub: the bulletin payload (text + detail) is passed via
- * router state from the banner; later this page will fetch from the
- * same /api/bulletin endpoint and look the id up directly.
+ * Phase 1 stub: content payload will land once wiki exposes a per-id
+ * bulletin GET.  Router state carries text/detail from the banner today.
  */
 const UNLOCK_PIN = '0303'
 
@@ -21,11 +19,9 @@ export default function BulletinDetail() {
 
   if (!unlocked) {
     return (
-      <main style={{ padding: 16 }}>
-        <h1>잠금 해제</h1>
-        <p style={{ color: '#888', fontSize: 13 }}>
-          PIN으로 보호된 상세 내용을 보려면 4자리 PIN을 입력하세요.
-        </p>
+      <main className="page">
+        <h1 style={{ marginTop: 0, fontSize: 18 }}>잠금 해제</h1>
+        <p className="muted">4자리 PIN 을 입력하세요.</p>
         <input
           inputMode="numeric"
           maxLength={4}
@@ -38,20 +34,31 @@ export default function BulletinDetail() {
             }
           }}
           placeholder="****"
-          style={{ fontSize: 24, letterSpacing: 8, width: 120, padding: 8 }}
+          style={{
+            fontSize: 24,
+            letterSpacing: 8,
+            width: 140,
+            padding: '10px 12px',
+            border: '1px solid var(--md-sys-color-outline)',
+            borderRadius: 8,
+            background: 'var(--md-sys-color-surface)',
+            color: 'var(--md-sys-color-on-surface)',
+          }}
         />
         {showHint && pin !== UNLOCK_PIN && (
-          <p style={{ color: 'crimson', fontSize: 13 }}>PIN이 맞지 않습니다.</p>
+          <p style={{ color: 'var(--md-sys-color-error)', fontSize: 13 }}>
+            PIN이 맞지 않습니다.
+          </p>
         )}
       </main>
     )
   }
 
   return (
-    <main style={{ padding: 16 }}>
-      <h1>Bulletin {id}</h1>
-      <p style={{ color: '#888', fontSize: 12 }}>
-        detail body 렌더링은 다음 단계 (wiki bulletin item GET endpoint 필요).
+    <main className="page">
+      <h1 style={{ marginTop: 0, fontSize: 18 }}>Bulletin {id}</h1>
+      <p className="muted">
+        detail body 렌더링은 wiki bulletin item GET 이 도착하면 붙습니다.
       </p>
     </main>
   )

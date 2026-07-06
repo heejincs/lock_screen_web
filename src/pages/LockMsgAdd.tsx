@@ -7,8 +7,6 @@ import { signInUrl } from '../lib/auth'
 /**
  * Add a Kakao profile lock-msg item — mirrors Android `AddLockMsgDialog`.
  * Two text fields (public `text` + PIN-gated `detail`) + category chips.
- * Posts to `/api/bulletin/lock-msg/append`; the server-side `detail`
- * field accept-handler is pending wiki cc nmsg (drafted 2026-06-27).
  */
 const CATEGORIES: BulletinCategory[] = ['kinfo', 'info', 'warn', 'feature']
 
@@ -49,49 +47,55 @@ export default function LockMsgAdd() {
   }
 
   return (
-    <main style={{ padding: 16, maxWidth: 480 }}>
-      <h1>카톡 프로필 추가</h1>
-      <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <label>
-          내용 (공개)
+    <main className="page">
+      <h1 style={{ marginTop: 0, fontSize: 18 }}>카톡 프로필 추가</h1>
+      <form onSubmit={submit} className="stack">
+        <div className="field">
+          <label htmlFor="text">내용 (공개)</label>
           <textarea
+            id="text"
             value={text}
             onChange={(e) => setText(e.target.value)}
             rows={3}
             required
-            style={{ width: '100%' }}
           />
-        </label>
-        <label>
-          상세 (PIN으로 보호됨)
+        </div>
+        <div className="field">
+          <label htmlFor="detail">상세 (PIN으로 보호됨)</label>
           <textarea
+            id="detail"
             value={detail}
             onChange={(e) => setDetail(e.target.value)}
             rows={4}
-            style={{ width: '100%' }}
           />
-        </label>
-        <fieldset>
-          <legend>카테고리</legend>
-          {CATEGORIES.map((c) => (
-            <label key={c} style={{ marginRight: 12 }}>
-              <input
-                type="radio"
-                name="category"
-                value={c}
-                checked={category === c}
-                onChange={() => setCategory(c)}
-              />{' '}
-              {c}
-            </label>
-          ))}
-        </fieldset>
+        </div>
+        <div className="field">
+          <span className="field-label">카테고리</span>
+          <div className="chip-group">
+            {CATEGORIES.map((c) => (
+              <label key={c}>
+                <input
+                  type="radio"
+                  name="category"
+                  value={c}
+                  checked={category === c}
+                  onChange={() => setCategory(c)}
+                />
+                {c}
+              </label>
+            ))}
+          </div>
+        </div>
         <div>
-          <button type="submit" disabled={submitting || !text.trim()}>
+          <button
+            type="submit"
+            className="btn"
+            disabled={submitting || !text.trim()}
+          >
             {submitting ? '전송 중…' : '추가'}
           </button>
         </div>
-        {result && <p>{result}</p>}
+        {result && <p className="muted">{result}</p>}
       </form>
     </main>
   )

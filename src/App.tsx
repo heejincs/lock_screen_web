@@ -7,6 +7,7 @@ import StudyList from './pages/StudyList'
 import StudyAdd from './pages/StudyAdd'
 import StudyFlash from './pages/StudyFlash'
 import StudyDetail from './pages/StudyDetail'
+import NmsgList from './pages/NmsgList'
 import './theme.css'
 
 /**
@@ -33,7 +34,7 @@ export default function App() {
         </nav>
         <Routes>
           <Route path="/" element={<AgentsList />} />
-          <Route path="/nmsg" element={<NmsgTabStub />} />
+          <Route path="/nmsg" element={<NmsgList />} />
           <Route path="/servers" element={<ServersTabStub />} />
           <Route path="/study" element={<StudyList />} />
           <Route path="/study/add" element={<StudyAdd />} />
@@ -45,20 +46,6 @@ export default function App() {
         </Routes>
       </div>
     </BrowserRouter>
-  )
-}
-
-/** Placeholder — full port pending Android NmsgTab parity work. */
-function NmsgTabStub() {
-  return (
-    <main className="page">
-      <h1 style={{ marginTop: 0, fontSize: 18 }}>nmsg</h1>
-      <p className="muted">
-        Android NmsgTab 시각 파리티는 다음 스프린트에서 이식 예정입니다.
-        지금은 <a href="/api/agent-list" target="_blank" rel="noreferrer">/api/agent-list</a> 응답에
-        nmsg 집계가 없어서 프론트에서 agent-detail per-agent 순회가 필요합니다.
-      </p>
-    </main>
   )
 }
 
